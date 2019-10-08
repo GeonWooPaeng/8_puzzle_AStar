@@ -1,9 +1,10 @@
 from queue import PriorityQueue
 from copy import deepcopy
+import argparse
 
 class E_puzzle:
     def __init__(self,start,parent):
-        self.board = start 
+        self.state = start 
         self.parent = parent 
         self.f = 0
         self.g = 0
@@ -14,13 +15,14 @@ def distance(child,goal):
     dist = 0
     for i in range(3):
         for j in range(3):
-            if child.board[i][j] != goal[i][j]:
+            if child.state[i][j] != goal[i][j]:
                 dist += 1
     return dist
             
+
 #Move and find children 
 def Move(current): 
-    current = current.board
+    current = current.state
     for i in range(3):
         for j in range(3):
             if current[i][j] == 0:
@@ -28,7 +30,6 @@ def Move(current):
                 break    
 
     children = []
-
     if y != 2: #right
         child = deepcopy(current)
         child[x][y] = child[x][y+1]
@@ -65,10 +66,10 @@ def priorityqueue(openlist):
     f = openlist[0].f
     PQ.put((f,openlist[0]))
     
-    for item in openlist:
-        if item.f < f:
-            f = item.f
-            PQ.put((f,item))
+    for node in openlist:
+        if node.f < f:
+            f = node.f
+            PQ.put((f,node))
             
     return PQ.get()[1]
 
@@ -90,7 +91,7 @@ def Astar(start,goal):
 
     while openList: 
         current = priorityqueue(openList)
-        if current.board == goal:
+        if current.state == goal:
             return current
                      
         openList.remove(current)
@@ -102,35 +103,45 @@ def Astar(start,goal):
                 if child != child_c:
                     #f(n) = h(n) + g(n) 
                     g = current.g + 1 
-                    child.g = g 
-                    child.h = distance(child,goal)
-                    child.f = child.g + child.h 
-                    child.parent = current 
-                    openList.append(child)
+                    present = False
+                    for i , child_o in enumerate(openList):
+                        if child == child_o:
+                            present = True
+                            if g < openList[i].g:
+                                openList[i].f = g + openList[i].h 
+                                openList[i].parent = current
+                    if not present:
+                        child.f = g + distance(child,goal) 
+                        child.parent = current 
+                        openList.append(child)
                 else:
                     break 
     return 0
 
+# 타고타고 올라가면서 체크 해야한다.
 
-      
+
 # Write start value and goal value here
-start = [[1,2,0],[3,4,5],[6,7,8]]
-goal = [[0,1,2],[3,4,5],[6,7,8]] 
-a = E_puzzle(start, None)
-result = Astar(a,goal)
+# start = [[1,2,0],[3,4,5],[6,7,8]]
+# goal = [[0,1,2],[3,4,5],[6,7,8]]
 
-Path = []
-if(not result):
-    print ("No solution")
-else:
-    Path.append([y for x in result.board for y in x]) 
-    t=result.parent
-    while t:
-        Path.append([y for x in t.board for y in x])
-        t=t.parent
-for i in range(len(Path)-1,-1,-1):
-    print(' '.join(map(str,Path[i])))
+parser = argparse.ArgumentParser()
+parser.add_argument('--input',type=argparse.FileType('r'),required=True)
+args = parser.parse_args()
+print(args.input.readlines())
 
+# a = E_puzzle(start, None)
+# solution = Astar(a,goal)
 
+# Path = []
+# if not solution:
+#     print ("No solution")
+# else:
+#     Path.append([y for x in solution.state for y in x]) 
+#     state = solution.parent
+#     while state:
+#         Path.append([y for x in state.state for y in x])
+#         state = state.parent
+# for i in range(len(Path)-1,-1,-1):
+#     print(' '.join(map(str,Path[i])))
 
-        

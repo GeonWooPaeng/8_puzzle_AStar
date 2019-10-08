@@ -191,7 +191,7 @@ class Puzzle:
 
 
 # example of use     
-board = [[1,2,3],[4,5,0],[6,7,8]]
+board = [[1,2,3],[4,5,6],[0,7,8]]
 puzzle = Puzzle(board)
 #puzzle = puzzle.shuffle()
 s = Solver(puzzle)

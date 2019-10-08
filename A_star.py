@@ -99,7 +99,7 @@ class AStar_Solver:
 
 
 if __name__ == "__main__":
-    start1 = "120345678"
+    start1 = "123456780"
     goal1  = "012345687"
     print("Starting...")
 
